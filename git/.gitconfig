@@ -1,0 +1,28 @@
+[user]
+  name = Nadeem Mohsin
+  email = nadeemm@verily.com
+
+  [url "git@github.com:"]
+    insteadOf = https://github.com
+  [url "ssh://git@github.com/verily-src/"]
+    insteadOf = https://github.com/verily-src/
+  [url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+
+[push]
+  default = current
+  autoSetupRemote = true
+
+[alias]
+  sw = switch
+  co = checkout
+  mk = switch -c
+  br = branch -l -v
+  ci = !git checkout $(git branch -l nm/* | fzf | xargs)
+  st = status
+  ll = log --pretty --oneline
+  rbm = !git sw main && git pull && git sw - && git rebase main
+  rbmv = !git sw main && git pull && git co - && git rebase main && go mod vendor
+
+[maintenance]
+  # Add whatever repo you want to run regular maintenance on.
