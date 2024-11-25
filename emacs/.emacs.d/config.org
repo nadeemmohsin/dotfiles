@@ -1,0 +1,476 @@
+#+TITLE: Emacs Config
+#+AUTHOR: Nadeem Mohsin
+#+DESCRIPTION: Personal Emacs config.
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+* TABLE OF CONTENTS                                                     :toc:
+- [[#all-the-icons][ALL THE ICONS]]
+- [[#backupnnn-files][BACKUP FILES]]
+- [[#buffers][BUFFERS]]
+- [[#completions][COMPLETIONS]]
+  - [[#vertico][Vertico]]
+  - [[#marginalia][Marginalia]]
+  - [[#orderless][Orderless]]
+  - [[#use-tab-for-indentation-and-completion][Use Tab for indentation and completion]]
+  - [[#consult][Consult]]
+- [[#defaults][DEFAULTS]]
+  - [[#disable-useless-ui][Disable useless UI]]
+  - [[#cleaner-scrolling][Cleaner scrolling]]
+  - [[#line-numbers-and-columns][Line numbers and columns]]
+  - [[#fix-minor-annoyances][Fix minor annoyances]]
+  - [[#electric-parens][Electric parens]]
+- [[#diminish][DIMINISH]]
+- [[#evil-mode][EVIL-MODE]]
+  - [[#basic-installation][Basic Installation]]
+  - [[#goggles][Goggles]]
+  - [[#surround][Surround]]
+  - [[#follow-org-links][Follow Org links]]
+  - [[#commenting-code][Commenting code]]
+- [[#keybindings][KEYBINDINGS]]
+  - [[#generalel-setup-and-leader-key-config][General.el setup and leader key config.]]
+  - [[#mac-rebinding][Mac rebinding]]
+- [[#markdown][MARKDOWN]]
+- [[#modeline][MODELINE]]
+- [[#org-mode][ORG MODE]]
+  - [[#table-of-contents][Table of Contents]]
+  - [[#nice-looking-bullets][Nice looking bullets]]
+  - [[#diminish-org-indent-mode][Diminish Org Indent Mode]]
+  - [[#org-tempo][Org Tempo]]
+- [[#rainbow-delimiters][RAINBOW DELIMITERS]]
+- [[#themes][THEMES]]
+- [[#which-key][WHICH-KEY]]
+
+* ALL THE ICONS
+Note that you need to run two commands on a new install to make this work.
+1. M-x all-the-icons-install-fonts
+2. M-x nerd-icons-install-fonts
+
+#+begin_src emacs-lisp
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+#+end_src
+
+
+* BACKUP FILES
+  #+begin_src emacs-lisp
+    (setq backup-directory-alist `(("." . "~/.emacs.bak")))
+  #+end_src
+
+* BUFFERS
+#+begin_src emacs-lisp
+  ;; External changes should update open buffers.
+  (global-auto-revert-mode t)
+
+  ;; Uniquify buffer names, ignoring special buffers.
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-after-kill-buffer-p t
+        uniquify-ignore-buffers-re "^\\*")
+
+  ;; Remember buffer history.
+  (recentf-mode 1)
+  (savehist-mode 1)
+#+end_src
+
+* COMPLETIONS
+
+** Vertico
+This is a superior UI for the default completion system.
+#+begin_src emacs-lisp
+  ;; Enable vertico
+  (use-package vertico
+    :bind (:map vertico-map
+                ("C-j" . vertico-next)
+                ("C-k" . vertico-previous)
+                :map minibuffer-local-map
+                ("C-w" . backward-kill-word))
+    :custom
+    (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+    (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
+    :init
+    (vertico-mode))
+
+#+end_src
+
+** Marginalia
+This provides helpful annotations, just like which-key.
+#+begin_src emacs-lisp
+  ;; Enable rich annotations using the Marginalia package
+  (use-package marginalia
+    ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+    ;; available in the *Completions* buffer, add it to the
+    ;; `completion-list-mode-map'.
+    :bind (:map minibuffer-local-map
+                ("M-A" . marginalia-cycle))
+
+    ;; The :init section is always executed.
+    :init
+    ;; Marginalia must be activated in the :init section of use-package such that
+    ;; the mode gets enabled right away. Note that this forces loading the
+    ;; package.
+    (marginalia-mode))
+#+end_src
+
+
+** Orderless
+Provides a completion style based on space separated components in any order.
+#+begin_src emacs-lisp
+  (use-package orderless
+    :custom
+    ;; Configure a custom style dispatcher (see the Consult wiki)
+    ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
+    ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+    (completion-styles '(orderless basic))
+    (completion-category-defaults nil)
+    (completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
+
+** Use Tab for indentation and completion
+#+begin_src emacs-lisp
+  (setq tab-always-indent 'complete)
+#+end_src
+
+** Consult
+#+begin_src emacs-lisp
+(use-package consult)
+#+end_src
+
+* DEFAULTS
+** Disable useless UI
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+#+end_src
+** Cleaner scrolling
+#+begin_src emacs-lisp
+  (setq scroll-step 1
+        scroll-conservatively 101)
+#+end_src
+** Line numbers and columns
+Show line numbers everywhere, with a handful of exceptions where it makes no sense.
+Column numbers should always be shown in the modeline.
+#+begin_src emacs-lisp
+  (global-display-line-numbers-mode 1)
+  (dolist (mode '(term-mode-hook
+                  vterm-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook
+                  dired-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+  (column-number-mode 1)
+#+end_src
+
+** Fix minor annoyances
+Miscellaneous minor tweaks.
+
+#+begin_src emacs-lisp
+  ;; Use y/n instead of overly cumbersome yes/no.
+  (defalias 'yes-or-no-p 'y-or-n-p)
+
+  ;; Fix the weird quirk where typing doesn't overwrite your selection.
+  (delete-selection-mode 1)
+
+  ;; Jump to a help window after opening it so we can close it easily.
+  (setq help-window-select t)
+
+  ;; Follow symlinks without prompting.
+  (setq vc-follow-symlinks t)
+#+end_src
+
+** Electric parens
+This adds the closing paren when you type an opening one. The one exception is in org-mode for this
+config, because I want to use `<s TAB` to create code blocks.
+
+#+begin_src emacs-lisp
+  (electric-pair-mode 1)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (setq-local electric-pair-inhibit-predicate
+                          `(lambda (c)
+                             (if (char-equal c ?<)
+                                 t
+                               (,electric-pair-inhibit-predicate c))))))
+#+end_src
+
+* DIMINISH
+With this installed, you can suppress any mode from the modeline by adding `:diminish` to the use-package block.
+
+#+begin_src emacs-lisp
+(use-package diminish)
+#+end_src
+
+
+* EVIL-MODE
+Vim keybindings for Emacs!
+
+** Basic Installation
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    ;; These two are prereqs for evil-collection.
+    (setq evil-want-integration t
+          evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t
+          evil-undo-system 'undo-redo
+          evil-vsplit-window-right t
+          evil-split-window-below t)
+    (evil-mode))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    ;; Enable Evil in help buffers too.
+    (add-to-list 'evil-collection-mode-list 'help)
+    (evil-collection-init))
+#+end_src
+
+
+** Goggles
+#+begin_src emacs-lisp
+  (use-package evil-goggles
+    :after evil
+    :config
+    (evil-goggles-mode))
+#+end_src
+** Surround
+#+begin_src emacs-lisp
+  (use-package evil-surround
+    :after evil
+    :config
+    (global-evil-surround-mode 1))
+#+end_src
+
+** Follow Org links
+#+begin_src emacs-lisp
+  ;; Using Return key to follow links in Org/Evil
+  ;; Unmap keys in 'evil-maps.
+  ;; If this is not done, org-return-follows-link doesn't work.
+  (with-eval-after-load 'evil-maps
+    (define-key evil-motion-state-map (kbd "SPC") nil)
+    (define-key evil-motion-state-map (kbd "RET") nil)
+    (define-key evil-motion-state-map (kbd "TAB") nil))
+  ;; Setting Return key in org-mode to follow links
+  (setq org-return-follows-link  t)
+#+end_src
+
+** Commenting code
+#+begin_src emacs-lisp
+    (use-package evil-commentary
+      :after evil
+      :init
+      (setq evil-goggles-duration 0.05)
+      :config
+      (evil-commentary-mode)
+      (evil-goggles-use-diff-faces))
+#+end_src
+
+
+* KEYBINDINGS
+This section uses general.el to set up a leader key, as well as bindings for
+commonly used operations.
+
+** General.el setup and leader key config.
+
+#+begin_src emacs-lisp
+  (use-package general
+    :config
+    (general-evil-setup)
+
+    (general-mmap
+      ;; My muscle memory for these shortcuts is a bit too strong, so
+      ;; I'm overriding them to behave as expected on Emacs / Mac.
+      "C-a" 'back-to-indentation
+      "C-e" 'end-of-line
+      ;; This will adjust the text scale everywhere.
+      ;; You can repeatedly press + or - to achieve the size you want.
+      "C-=" 'global-text-scale-adjust)
+
+    ;; Space as the global leader key.
+    (general-create-definer nm/leader-keys
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      ;; SPC normally, M-SPC in insert mode.
+      :prefix "SPC"
+      :global-prefix "M-SPC")
+
+    (nm/leader-keys
+      "b" '(:ignore t :wk "Buffers")
+      "b b" '(consult-buffer :wk "Switch to buffer")
+      "b i" '(ibuffer :wk "Ibuffer")
+      "b k" '(kill-current-buffer :wk "Kill current buffer")
+      "b K" '(kill-some-buffers :wk "Kill multiple buffers")
+      "b n" '(next-buffer :wk "Next buffer")
+      "b p" '(previous-buffer :wk "Previous buffer")
+      "b r" '(revert-buffer :wk "Reload buffer")
+      "b R" '(rename-buffer :wk "Rename buffer")
+
+      "o" '(other-window :wk "Cycle between buffers")
+
+      "," '(consult-buffer :wk "Switch buffer")
+      "<" '(consult-buffer-other-window :wk "Switch buffer (other window)")
+
+      "x" '((lambda () (interactive)
+              (switch-to-buffer "*scratch*"))
+            :wk "Open scratch buffer"))
+
+    (nm/leader-keys
+      "c" '(:ignore t :wk "Config")
+      "c c" '((lambda () (interactive)
+                (find-file "~/.emacs.d/config.org"))
+              :wk "Open emacs config.org")
+      "c e" '((lambda () (interactive)
+                (dired "~/.emacs.d/"))
+              :wk "Open emacs config directory")
+      "c r" '(:ignore t :wk "Reload")
+      "c r r" '((lambda () (interactive)
+                  (load-file "~/.emacs.d/init.el")
+                  (ignore (elpaca-process-queues)))
+                :wk "Reload emacs config"))
+
+    (nm/leader-keys
+      "h" '(:ignore t :wk "Help")
+      "h a" '(apropos :wk "Apropos")
+      "h b" '(describe-bindings :wk "Describe bindings")
+      "h d" '(:ignore t :wk "Emacs documentation")
+      "h d a" '(about-emacs :wk "About Emacs")
+      "h d d" '(view-emacs-debugging :wk "View Emacs debugging")
+      "h d m" '(info-emacs-manual :wk "The Emacs manual")
+      "h e" '(view-echo-area-messages :wk "View *Messages* buffer")
+      "h f" '(describe-function :wk "Describe function")
+      "h F" '(describe-face :wk "Describe face")
+      "h i" '(info :wk "Info")
+      "h k" '(describe-key :wk "Describe key")
+      "h l" '(view-lossage :wk "Display recent keystrokes and the commands run")
+      "h m" '(describe-mode :wk "Describe mode")
+      "h t" '(load-theme :wk "Load theme")
+      "h v" '(describe-variable :wk "Describe variable")
+      "h w" '(where-is :wk "Prints keybinding for command if set")
+      "h x" '(describe-command :wk "Display full documentation for command"))
+
+    ;; Misc
+    (nm/leader-keys
+      "SPC" '(execute-extended-command :wk "Execute command")
+      "u" '(universal-argument :wk "Universal argument")
+
+      "." '(find-file :which-key "Find file")
+      ">" '(find-file-other-window :which-key "Find file (new window)")
+
+      "i" '(consult-imenu :wk "Imenu")
+
+      "s" '(consult-line :wk "Search")))
+#+end_src
+
+** Mac rebinding
+Having Command be Super breaks my muscle memory, so this designates Command as Meta instead.
+
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+    (setq mac-option-key-is-meta nil
+          mac-command-key-is-meta t
+          mac-command-modifier 'meta
+          mac-option-modifier 'none))
+#+end_src
+
+
+* MARKDOWN
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode)
+  :mode (("README\\.md\\'" . gfm-mode))
+  :init (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
+#+end_src
+
+* MODELINE
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 35
+          doom-modeline-bar-width 5))
+#+end_src
+
+* ORG MODE
+
+** Table of Contents
+#+begin_src emacs-lisp
+  (use-package toc-org
+    :commands toc-org-enable
+    :init (add-hook 'org-mode-hook 'toc-org-enable))
+#+end_src
+
+** Nice looking bullets
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'org-indent-mode)
+  (use-package org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+
+** Diminish Org Indent Mode
+Suppresses 'Ind' from the modeline.
+
+#+begin_src emacs-lisp
+  (eval-after-load 'org-indent '(diminish 'org-indent-mode))
+#+end_src
+
+** Org Tempo
+This is really just handy for editing this file, since it allows inserting
+code blocks quickly by typing `<s` followed by TAB.
+
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+#+end_src
+
+
+* RAINBOW DELIMITERS
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook ((prog-mode . rainbow-delimiters-mode)))
+#+end_src
+
+
+* THEMES
+
+#+begin_src emacs-lisp
+(use-package doom-themes
+  :config
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  ;; Sets the default theme.
+  (load-theme 'doom-moonlight t)
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+#+end_src
+
+
+
+* WHICH-KEY
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :init
+    (which-key-mode 1)
+    :diminish
+    :config
+    (setq which-key-side-window-location 'bottom
+	  which-key-sort-order #'which-key-key-order-alpha
+	  which-key-allow-imprecise-window-fit nil
+	  which-key-sort-uppercase-first nil
+	  which-key-add-column-padding 1
+	  which-key-max-display-columns nil
+	  which-key-min-display-lines 6
+	  which-key-side-window-slot -10
+	  which-key-side-window-max-height 0.25
+	  which-key-idle-delay 0.8
+	  which-key-max-description-length 50
+	  which-key-allow-imprecise-window-fit nil
+	  which-key-separator " → " ))
+#+end_src
