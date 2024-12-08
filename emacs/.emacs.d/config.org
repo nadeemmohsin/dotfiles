@@ -22,12 +22,14 @@
   - [[#fix-minor-annoyances][Fix minor annoyances]]
   - [[#electric-parens][Electric parens]]
 - [[#diminish][DIMINISH]]
+- [[#eglot][EGLOT]]
 - [[#evil-mode][EVIL-MODE]]
   - [[#basic-installation][Basic Installation]]
   - [[#goggles][Goggles]]
   - [[#surround][Surround]]
   - [[#follow-org-links][Follow Org links]]
   - [[#commenting-code][Commenting code]]
+- [[#git][GIT]]
 - [[#keybindings][KEYBINDINGS]]
   - [[#generalel-setup-and-leader-key-config][General.el setup and leader key config.]]
   - [[#mac-rebinding][Mac rebinding]]
@@ -269,6 +271,20 @@ With this installed, you can suppress any mode from the modeline by adding `:dim
 #+end_src
 
 
+* EGLOT
+I'm experimenting with eglot for LSP support. This might eventually require
+going back to `lsp-mode`, but for now this seems to be okay.
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil
+    :hook (python-mode . eglot-ensure)
+    :config
+    (setq eglot-confirm-server-initiated-edits nil))
+
+#+end_src
+
+
 * EVIL-MODE
 Vim keybindings for Emacs!
 
@@ -334,6 +350,24 @@ Vim keybindings for Emacs!
 #+end_src
 
 
+
+* GIT
+Set up magit. There's a dependency on `transient` that needs to be
+handled. Other than that, we can use `diff-hl` to highlight
+uncommitted changes.
+#+begin_src emacs-lisp
+  (use-package transient)
+  (use-package magit
+    :after transient)
+
+  (use-package diff-hl
+    :init
+    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    :config
+    (global-diff-hl-mode))
+#+end_src
+
 * KEYBINDINGS
 This section uses general.el to set up a leader key, as well as bindings for
 commonly used operations.
@@ -362,6 +396,7 @@ commonly used operations.
       :prefix "SPC"
       :global-prefix "M-SPC")
 
+    ;; Buffers
     (nm/leader-keys
       "b" '(:ignore t :wk "Buffers")
       "b b" '(consult-buffer :wk "Switch to buffer")
@@ -382,6 +417,7 @@ commonly used operations.
               (switch-to-buffer "*scratch*"))
             :wk "Open scratch buffer"))
 
+    ;; Config
     (nm/leader-keys
       "c" '(:ignore t :wk "Config")
       "c c" '((lambda () (interactive)
@@ -395,6 +431,25 @@ commonly used operations.
                   (load-file "~/.emacs.d/init.el")
                   (ignore (elpaca-process-queues)))
                 :wk "Reload emacs config"))
+
+    ;; Magit
+    (nm/leader-keys
+      "g" '(:ignore t :wk "Git")
+      "g g" '(magit-status :wk "Status")
+      "g l" '(magit-log :wk "Log"))
+
+    ;; LSP
+    (nm/leader-keys
+      "l" '(:ignore t :wk "LSP")
+      "l a" '(eglot-code-actions :wk "Code Actions")
+      "l d" '(consult-flymake :wk "Errors")
+      "l f" '(eglot-format :wk "Format")
+      "l i" '(eglot-code-action-inline :wk "Inline")
+      "l o" '(eglot-code-action-organize-imports :wk "Organize imports")
+      "l q" '(eglot-quickfix :wk "Quick fix")
+      "l r" '(eglot-rename :wk "Rename")
+      "l ." '(xref-find-definitions :wk "Find definition")
+      "l >" '(xref-find-definitions-other-window :wk "Find definition (other window)"))
 
     (nm/leader-keys
       "h" '(:ignore t :wk "Help")
