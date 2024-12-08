@@ -42,6 +42,7 @@
   - [[#org-tempo][Org Tempo]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#themes][THEMES]]
+- [[#vterm][VTERM]]
 - [[#which-key][WHICH-KEY]]
 
 * ALL THE ICONS
@@ -281,7 +282,6 @@ going back to `lsp-mode`, but for now this seems to be okay.
     :hook (python-mode . eglot-ensure)
     :config
     (setq eglot-confirm-server-initiated-edits nil))
-
 #+end_src
 
 
@@ -476,6 +476,8 @@ commonly used operations.
       "SPC" '(execute-extended-command :wk "Execute command")
       "u" '(universal-argument :wk "Universal argument")
 
+      "'" '(vterm-toggle :wk "Toggle vterm")
+
       "." '(find-file :which-key "Find file")
       ">" '(find-file-other-window :which-key "Find file (new window)")
 
@@ -570,6 +572,13 @@ code blocks quickly by typing `<s` followed by TAB.
 
 
 
+
+* VTERM
+#+begin_src emacs-lisp
+  (use-package vterm)
+  (use-package vterm-toggle
+    :after vterm)
+#+end_src
 * WHICH-KEY
 
 #+begin_src emacs-lisp
