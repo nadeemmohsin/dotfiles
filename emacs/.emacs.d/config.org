@@ -40,6 +40,7 @@
   - [[#nice-looking-bullets][Nice looking bullets]]
   - [[#diminish-org-indent-mode][Diminish Org Indent Mode]]
   - [[#org-tempo][Org Tempo]]
+- [[#projectile][PROJECTILE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#themes][THEMES]]
 - [[#vterm][VTERM]]
@@ -432,12 +433,6 @@ commonly used operations.
                   (ignore (elpaca-process-queues)))
                 :wk "Reload emacs config"))
 
-    ;; Magit
-    (nm/leader-keys
-      "g" '(:ignore t :wk "Git")
-      "g g" '(magit-status :wk "Status")
-      "g l" '(magit-log :wk "Log"))
-
     ;; LSP
     (nm/leader-keys
       "l" '(:ignore t :wk "LSP")
@@ -451,6 +446,17 @@ commonly used operations.
       "l ." '(xref-find-definitions :wk "Find definition")
       "l >" '(xref-find-definitions-other-window :wk "Find definition (other window)"))
 
+    ;; Magit
+    (nm/leader-keys
+      "g" '(:ignore t :wk "Git")
+      "g g" '(magit-status :wk "Status")
+      "g l" '(magit-log :wk "Log"))
+
+    ;; Projectile
+    (nm/leader-keys
+      "p" '(:keymap projectile-command-map :wk "Projectile"))
+
+    ;; Help.
     (nm/leader-keys
       "h" '(:ignore t :wk "Help")
       "h a" '(apropos :wk "Apropos")
@@ -545,6 +551,15 @@ code blocks quickly by typing `<s` followed by TAB.
 
 #+begin_src emacs-lisp
   (require 'org-tempo)
+#+end_src
+
+
+
+* PROJECTILE
+#+begin_src emacs-lisp
+  (use-package projectile
+    :init
+    (projectile-mode 1))
 #+end_src
 
 
