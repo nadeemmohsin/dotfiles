@@ -489,7 +489,9 @@ commonly used operations.
 
       "i" '(consult-imenu :wk "Imenu")
 
-      "s" '(consult-line :wk "Search")))
+      "s" '(consult-line :wk "Search")
+
+      "w" '(:keymap evil-window-map :wk "Window")))
 #+end_src
 
 ** Mac rebinding
