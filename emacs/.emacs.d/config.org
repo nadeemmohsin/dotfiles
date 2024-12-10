@@ -43,6 +43,7 @@
 - [[#projectile][PROJECTILE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#themes][THEMES]]
+- [[#tree-sitter][TREE SITTER]]
 - [[#vterm][VTERM]]
 - [[#which-key][WHICH-KEY]]
 
@@ -280,7 +281,9 @@ going back to `lsp-mode`, but for now this seems to be okay.
 #+begin_src emacs-lisp
   (use-package eglot
     :ensure nil
-    :hook (python-mode . eglot-ensure)
+    :hook
+    (python-ts-mode . eglot-ensure)
+    (go-ts-mode . eglot-ensure)
     :config
     (setq eglot-confirm-server-initiated-edits nil))
 #+end_src
@@ -349,7 +352,6 @@ Vim keybindings for Emacs!
       (evil-commentary-mode)
       (evil-goggles-use-diff-faces))
 #+end_src
-
 
 
 * GIT
@@ -454,7 +456,7 @@ commonly used operations.
 
     ;; Projectile
     (nm/leader-keys
-      "p" '(:keymap projectile-command-map :wk "Projectile"))
+      "p" '(:package projectile :keymap projectile-command-map :wk "Projectile"))
 
     ;; Help.
     (nm/leader-keys
@@ -589,6 +591,20 @@ code blocks quickly by typing `<s` followed by TAB.
 
 
 
+
+* TREE SITTER
+This gives Emacs the ability to understand source code, meaning things like
+syntax highlighting, indentation, and so forth. Currently I'm using this with
+`python-ts-mode` and `go-ts-mode`.
+
+#+begin_src emacs-lisp
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+#+end_src
 
 * VTERM
 #+begin_src emacs-lisp
