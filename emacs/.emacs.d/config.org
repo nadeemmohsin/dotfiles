@@ -5,6 +5,9 @@
 #+OPTIONS: toc:2
 
 * TABLE OF CONTENTS                                                     :toc:
+- [[#prerequisites][PREREQUISITES]]
+  - [[#before][Before]]
+  - [[#after][After]]
 - [[#all-the-icons][ALL THE ICONS]]
 - [[#backup-files][BACKUP FILES]]
 - [[#buffers][BUFFERS]]
@@ -46,6 +49,27 @@
 - [[#tree-sitter][TREE SITTER]]
 - [[#vterm][VTERM]]
 - [[#which-key][WHICH-KEY]]
+
+* PREREQUISITES
+These are things you need to run before / after installing a package. I'm
+assembling them all here, so that a new install can be done relatively easily.
+
+** Before
+To make vterm work, you need to install:
+- cmake
+- libtool
+- libtool-bin
+
+Install language servers for your programming languages. Currently this is:
+- gopls
+- python-lsp-server
+
+Install multimarkdown.
+
+
+** After
+M-x all-the-icons-install-fonts
+M-x nerd-icons-install-fonts
 
 * ALL THE ICONS
 Note that you need to run two commands on a new install to make this work.
@@ -270,7 +294,7 @@ config, because I want to use `<s TAB` to create code blocks.
 With this installed, you can suppress any mode from the modeline by adding `:diminish` to the use-package block.
 
 #+begin_src emacs-lisp
-(use-package diminish)
+  (use-package diminish)
 #+end_src
 
 
@@ -597,6 +621,15 @@ This gives Emacs the ability to understand source code, meaning things like
 syntax highlighting, indentation, and so forth. Currently I'm using this with
 `python-ts-mode` and `go-ts-mode`.
 
+The actual `tree-sitter` package is included with Emacs by default now. However,
+the /grammars/ for it are not, and you need to install them for each language
+you work on. To get around this, I'm using the `treesit-auto` package. This
+automatically detects you opening a file which you don't have a grammar for, and
+prompts you to install the relevant grammar.
+
+Note that this does fire off when you use Consult's file preview, so you're
+going to end up doing a few installs just browsing a linguistically varied repo.
+
 #+begin_src emacs-lisp
 (use-package treesit-auto
   :custom
@@ -612,6 +645,7 @@ syntax highlighting, indentation, and so forth. Currently I'm using this with
   (use-package vterm-toggle
     :after vterm)
 #+end_src
+
 * WHICH-KEY
 
 #+begin_src emacs-lisp
