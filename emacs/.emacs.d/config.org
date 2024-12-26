@@ -9,6 +9,7 @@
   - [[#before][Before]]
   - [[#after][After]]
 - [[#all-the-icons][ALL THE ICONS]]
+- [[#avy][AVY]]
 - [[#backup-files][BACKUP FILES]]
 - [[#buffers][BUFFERS]]
 - [[#completions][COMPLETIONS]]
@@ -86,6 +87,10 @@ Note that you need to run two commands on a new install to make this work.
 #+end_src
 
 
+* AVY
+#+begin_src emacs-lisp
+  (use-package avy)
+#+end_src
 * BACKUP FILES
   #+begin_src emacs-lisp
     (setq backup-directory-alist `(("." . "~/.emacs.bak")))
@@ -514,6 +519,8 @@ commonly used operations.
       ">" '(find-file-other-window :which-key "Find file (new window)")
 
       "i" '(consult-imenu :wk "Imenu")
+
+      "j" '(avy-goto-char-2 :wk "Jump to bigram")
 
       "s" '(consult-line :wk "Search")
 
