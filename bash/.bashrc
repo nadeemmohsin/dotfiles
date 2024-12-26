@@ -91,3 +91,6 @@ export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 
 # Add Python to the path.
 export PATH=$PATH:$(brew --prefix python)/libexec/bin
+
+# For things that shouldn't be made public, e.g., Github tokens.
+source ~/.bash_private
