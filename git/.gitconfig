@@ -28,6 +28,8 @@
   sshCommand="/usr/bin/ssh"
 
 [maintenance]
+  auto = false
+  strategy = incremental
   repo = /Users/nadeemm/verily1
 
 [filter "lfs"]
