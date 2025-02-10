@@ -1,6 +1,6 @@
 [user]
   name = Nadeem Mohsin
-  email = nadeemm@verily.com
+	email = 117772535+nadeemmohsin@users.noreply.github.com
 
   [url "git@github.com:"]
     insteadOf = https://github.com
@@ -24,5 +24,14 @@
   rbm = !git sw main && git pull && git sw - && git rebase main
   rbmv = !git sw main && git pull && git co - && git rebase main && go mod vendor
 
+[core]
+  sshCommand="/usr/bin/ssh"
+
 [maintenance]
-  # Add whatever repo you want to run regular maintenance on.
+  repo = /Users/nadeemm/verily1
+
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
