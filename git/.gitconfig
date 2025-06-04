@@ -21,8 +21,21 @@
   ci = !git checkout $(git branch -l nm/* | fzf | xargs)
   st = status
   ll = log --pretty --oneline
+  # Rebase onto main.
   rbm = !git sw main && git pull && git sw - && git rebase main
-  rbmv = !git sw main && git pull && git co - && git rebase main && go mod vendor
+  # Prune all local branches other than main.
+  pra = git br | grep -v main | xargs git branch -D
+  # Prune all the merged branches.
+  pmb = "!f() { \
+      for b in $(git for-each-ref --format='%(refname:short)' refs/heads/); do \
+  	s=$(gh pr view \"$b\" --json state --jq .state 2>/dev/null); \
+  	if [ \"$s\" = \"MERGED\" ]; then \
+  	    echo \"Deleting merged branch: $b\"; \
+  	    git branch -D \"$b\"; \
+  	fi; \
+      done; \
+  }; f"
+
 
 [core]
   sshCommand="/usr/bin/ssh"
