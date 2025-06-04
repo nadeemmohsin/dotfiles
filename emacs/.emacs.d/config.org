@@ -45,6 +45,7 @@
   - [[#diminish-org-indent-mode][Diminish Org Indent Mode]]
   - [[#org-tempo][Org Tempo]]
 - [[#projectile][PROJECTILE]]
+- [[#protocol-buffers][PROTOCOL BUFFERS]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#themes][THEMES]]
 - [[#tree-sitter][TREE SITTER]]
@@ -597,6 +598,12 @@ code blocks quickly by typing `<s` followed by TAB.
     (projectile-mode 1))
 #+end_src
 
+* PROTOCOL BUFFERS
+#+begin_src emacs-lisp
+  (use-package protobuf-mode
+    :ensure t
+    :mode ("\\.proto\\'" . protobuf-mode))
+#+end_src
 
 * RAINBOW DELIMITERS
 #+begin_src emacs-lisp
