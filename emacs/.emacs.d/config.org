@@ -38,6 +38,7 @@
   - [[#generalel-setup-and-leader-key-config][General.el setup and leader key config.]]
   - [[#mac-rebinding][Mac rebinding]]
 - [[#markdown][MARKDOWN]]
+- [[#nix][NIX]]
 - [[#modeline][MODELINE]]
 - [[#org-mode][ORG MODE]]
   - [[#table-of-contents][Table of Contents]]
@@ -549,6 +550,15 @@ Having Command be Super breaks my muscle memory, so this designates Command as M
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode))
   :init (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
+#+end_src
+
+
+
+* NIX
+#+begin_src emacs-lisp
+(use-package nix-mode
+  :ensure t
+  :mode (("\\.nix\\'" . nix-mode)))
 #+end_src
 
 * MODELINE
