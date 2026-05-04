@@ -55,23 +55,31 @@
 - [[#which-key][WHICH-KEY]]
 
 * PREREQUISITES
-These are things you need to run before / after installing a package. I'm
-assembling them all here, so that a new install can be done relatively easily.
+External (non-Emacs) dependencies needed for this config. Assembling them here
+so a new install can be done relatively easily.
 
 ** Before
-To make vterm work, you need to install:
+Build tools (for vterm native module):
 - cmake
 - libtool
-- libtool-bin
 
-Install language servers for your programming languages. Currently this is:
+Language servers (for eglot):
 - gopls
 - python-lsp-server
+- terraform-ls
 
-Install multimarkdown.
+Other tools:
+- git
+- multimarkdown
 
+Fonts (can also be installed via Emacs, see After):
+- all-the-icons fonts
+- nerd-fonts
+
+A C compiler is needed for =treesit-auto= to compile tree-sitter grammars on demand.
 
 ** After
+Only needed if fonts were not installed at the system level:
 M-x all-the-icons-install-fonts
 M-x nerd-icons-install-fonts
 
@@ -549,7 +557,7 @@ Having Command be Super breaks my muscle memory, so this designates Command as M
   :ensure t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode))
-  :init (setq markdown-command "/opt/homebrew/bin/multimarkdown"))
+  :init (setq markdown-command "multimarkdown"))
 #+end_src
 
 
