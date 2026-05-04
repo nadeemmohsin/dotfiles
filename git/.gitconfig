@@ -35,10 +35,15 @@
   	fi; \
       done; \
   }; f"
+  # Simple version
+  fco = "!git branch --format='%(refname:short)' | fzf | xargs git checkout"
 
+  # The "Pro" version with a preview window
+  fbr = "!git branch --format='%(refname:short)' | fzf --height 40% --reverse --preview 'git log --oneline --graph --color=always {} | head -15' | xargs git checkout"
 
 [core]
   sshCommand="/usr/bin/ssh"
+	pager = delta
 
 [maintenance]
   auto = false
@@ -50,3 +55,12 @@
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
+[claude]
+	initials = nm
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = true
+	syntax-theme = Monokai Extended
